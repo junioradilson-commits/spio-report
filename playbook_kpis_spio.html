@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Playbook KPIs — Regional SPIO | Mercado Livre DX</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',system-ui,sans-serif;background:#F7F6F0;color:#212121}
+
+/* NAV LATERAL */
+.sidebar{position:fixed;top:0;left:0;width:260px;height:100vh;background:#1A237E;overflow-y:auto;z-index:100;padding:0 0 40px}
+.sidebar-logo{background:#FFE600;padding:20px 20px 16px;position:sticky;top:0;z-index:10}
+.sidebar-logo-title{font-size:14px;font-weight:900;color:#1A237E;line-height:1.2}
+.sidebar-logo-sub{font-size:10px;color:#1A237E;opacity:.7;margin-top:2px}
+.nav-section{padding:16px 16px 4px;font-size:9px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase}
+.nav-item{display:block;padding:9px 20px;font-size:12px;font-weight:600;color:rgba(255,255,255,.55);cursor:pointer;border-left:3px solid transparent;transition:all .2s;text-decoration:none}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,.06)}
+.nav-item.active{color:#FFE600;border-left-color:#FFE600;background:rgba(255,230,0,.08);font-weight:700}
+
+/* CONTEÚDO */
+.main{margin-left:260px;min-height:100vh}
+.page{display:none;padding:40px 48px 60px}
+.page.active{display:block}
+
+/* HEADER DA PÁGINA */
+.page-header{margin-bottom:36px}
+.page-badge{display:inline-block;background:#FFE600;color:#1A237E;font-size:10px;font-weight:700;letter-spacing:2px;padding:4px 14px;border-radius:20px;margin-bottom:12px;text-transform:uppercase}
+.page-title{font-size:32px;font-weight:900;color:#1A237E;line-height:1.2;margin-bottom:8px}
+.page-desc{font-size:14px;color:#666;line-height:1.7;max-width:680px}
+
+/* KPI CARDS */
+.kpi-hero{background:#1A237E;border-radius:20px;padding:28px 32px;margin-bottom:32px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center}
+.kpi-hero-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.kpi-hero-name{font-size:28px;font-weight:900;color:#FFE600;margin-bottom:8px}
+.kpi-hero-desc{font-size:13px;color:rgba(255,255,255,.7);line-height:1.6}
+.kpi-hero-formula{background:rgba(255,230,0,.12);border:1px solid rgba(255,230,0,.2);border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;color:#FFE600;text-align:center;white-space:nowrap}
+
+/* BLOCOS DE CONTEÚDO */
+.block{background:#fff;border-radius:16px;padding:24px 28px;margin-bottom:20px;border:0.5px solid rgba(0,0,0,.06)}
+.block-title{font-size:14px;font-weight:800;color:#1A237E;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.block-title::before{content:'';width:4px;height:20px;background:#FFE600;border-radius:2px;flex-shrink:0}
+.block p{font-size:13px;color:#444;line-height:1.8;margin-bottom:10px}
+.block p:last-child{margin-bottom:0}
+
+/* TABELAS */
+.data-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.data-table th{background:#1A237E;color:#FFE600;font-weight:700;padding:10px 14px;text-align:left;font-size:11px;letter-spacing:.5px}
+.data-table td{padding:10px 14px;border-bottom:0.5px solid #F0F0F0;color:#424242;vertical-align:top}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:#FFFDE6}
+.data-table .mono{font-family:monospace;font-size:11px;background:#F5F5F5;padding:2px 6px;border-radius:4px;color:#C62828}
+
+/* STATUS PILLS */
+.pill{display:inline-block;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700}
+.pill-green{background:#E8F5E9;color:#2E7D32}
+.pill-orange{background:#FFF3E0;color:#E65100}
+.pill-red{background:#FFEBEE;color:#B71C1C}
+.pill-blue{background:#E8EAF6;color:#1A237E}
+.pill-yellow{background:#FFFDE6;color:#F57F17}
+
+/* THRESHOLD BOX */
+.threshold-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}
+.t-box{border-radius:12px;padding:14px 16px;text-align:center}
+.t-box-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.t-box-value{font-size:20px;font-weight:900;margin-bottom:2px}
+.t-box-desc{font-size:10px;opacity:.7}
+
+/* COMO ATUALIZAR */
+.step{display:flex;gap:14px;margin-bottom:16px;align-items:flex-start}
+.step-num{width:28px;height:28px;border-radius:50%;background:#FFE600;color:#1A237E;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-content{flex:1}
+.step-title{font-size:13px;font-weight:700;color:#212121;margin-bottom:3px}
+.step-desc{font-size:12px;color:#666;line-height:1.6}
+code{background:#F5F5F5;border:0.5px solid #E0E0E0;border-radius:4px;padding:2px 6px;font-size:11px;color:#C62828;font-family:monospace}
+
+/* CALLOUT */
+.callout{border-radius:12px;padding:16px 20px;margin:12px 0;display:flex;gap:12px}
+.callout-info{background:#E8EAF6;border-left:4px solid #1A237E}
+.callout-warn{background:#FFF3E0;border-left:4px solid #E65100}
+.callout-tip{background:#E8F5E9;border-left:4px solid #2E7D32}
+.callout-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.callout-text{font-size:12px;color:#424242;line-height:1.6}
+.callout-text strong{color:#1A237E}
+
+/* SCORE FORMULA */
+.formula-box{background:linear-gradient(135deg,#1A237E 0%,#283593 100%);border-radius:14px;padding:20px 24px;margin:12px 0}
+.formula-title{font-size:11px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.formula-expr{font-size:15px;font-weight:700;color:#FFE600;line-height:1.8}
+.formula-parts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.fp{background:rgba(255,255,255,.08);border-radius:8px;padding:8px 12px}
+.fp-kpi{font-size:11px;font-weight:700;color:#FFE600}
+.fp-peso{font-size:10px;color:rgba(255,255,255,.5)}
+.fp-desc{font-size:10px;color:rgba(255,255,255,.6);margin-top:2px}
+
+/* ÍNDICE CAPA */
+.index-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
+.index-card{background:#fff;border-radius:14px;padding:18px 20px;cursor:pointer;border:1.5px solid transparent;transition:all .2s;text-decoration:none;display:block}
+.index-card:hover{border-color:#FFE600;box-shadow:0 4px 16px rgba(255,230,0,.2)}
+.index-card-icon{font-size:20px;margin-bottom:8px}
+.index-card-title{font-size:13px;font-weight:800;color:#1A237E;margin-bottom:4px}
+.index-card-desc{font-size:11px;color:#888;line-height:1.5}
+
+/* DIVIDER */
+.divider{height:1px;background:#F0F0F0;margin:24px 0}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .main{margin-left:0}
+  .page{padding:24px 20px}
+  .threshold-grid{grid-template-columns:1fr}
+  .formula-parts{grid-template-columns:1fr 1fr}
+  .index-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-title">Playbook KPIs<br>Regional SPIO</div>
+    <div class="sidebar-logo-sub">mercado livre · driver experience</div>
+  </div>
+
+  <div class="nav-section">Introdução</div>
+  <a class="nav-item active" onclick="showPage('capa')">📋 Visão Geral</a>
+  <a class="nav-item" onclick="showPage('update')">🔄 Como Atualizar</a>
+
+  <div class="nav-section">Last Mile · SSP*</div>
+  <a class="nav-item" onclick="showPage('dsr')">📦 DSR — Delivery Success Rate</a>
+  <a class="nav-item" onclick="showPage('fdds')">🎯 FDDS — First Day Delivery</a>
+  <a class="nav-item" onclick="showPage('ftds')">⚡ FTDS — First Time Delivery</a>
+  <a class="nav-item" onclick="showPage('rts')">↩️ RTS Rate</a>
+  <a class="nav-item" onclick="showPage('csat')">⭐ CSAT — Satisfação Motorista</a>
+  <a class="nav-item" onclick="showPage('du')">❌ DU Breakdown — Motivos Falha</a>
+  <a class="nav-item" onclick="showPage('score')">🏆 Score Composto</a>
+  <a class="nav-item" onclick="showPage('wow')">📈 WoW — Week over Week</a>
+
+  <div class="nav-section">First Mile · BRXSP*</div>
+  <a class="nav-item" onclick="showPage('pus')">📦 PUS — Pick Up Success</a>
+  <a class="nav-item" onclick="showPage('cr')">📊 Collection Rate</a>
+  <a class="nav-item" onclick="showPage('backlog')">⏱️ Backlog &amp; Earlies</a>
+  <a class="nav-item" onclick="showPage('nopus')">❌ No PUS Breakdown</a>
+  <a class="nav-item" onclick="showPage('spr_fm')">🚚 SPR First Mile</a>
+
+  <div class="nav-section">Visualizações</div>
+  <a class="nav-item" onclick="showPage('viz')">📊 Guia dos Gráficos</a>
+</nav>
+
+<!-- CONTEÚDO -->
+<main class="main">
+
+<!-- ═══ CAPA ═══ -->
+<div class="page active" id="page-capa">
+  <div class="page-header">
+    <div class="page-badge">Playbook Oficial · DX SPIO</div>
+    <div class="page-title">Guia de KPIs &amp;<br>Dashboard SPIO</div>
+    <div class="page-desc">Documentação completa de todos os indicadores utilizados no Weekly Report da Regional SPIO. Inclui definição, fórmula, fonte de dados, meta, como ler cada gráfico e como atualizar o dashboard toda semana.</div>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-icon">📌</div>
+    <div class="callout-text"><strong>Para quem é esse playbook?</strong> Adilson Júnior (autor), gestores da Regional SPIO e qualquer analista que precise entender ou atualizar o Weekly Report.</div>
+  </div>
+
+  <div class="index-grid">
+    <a class="index-card" onclick="showPage('dsr')">
+      <div class="index-card-icon">📦</div>
+      <div class="index-card-title">DSR — Delivery Success Rate</div>
+      <div class="index-card-desc">KPI principal. Mede a taxa de entregas realizadas sobre despachadas. Meta: ≥ 97%</div>
+    </a>
+    <a class="index-card" onclick="showPage('fdds')">
+      <div class="index-card-icon">🎯</div>
+      <div class="index-card-title">FDDS — First Day Delivery Success</div>
+      <div class="index-card-desc">Mede entregas realizadas no primeiro dia na rota. Meta: ≥ 95%</div>
+    </a>
+    <a class="index-card" onclick="showPage('ftds')">
+      <div class="index-card-icon">⚡</div>
+      <div class="index-card-title">FTDS — First Time Delivery Success</div>
+      <div class="index-card-desc">Entregas na primeira tentativa, no primeiro dia. Meta: ≥ 93%</div>
+    </a>
+    <a class="index-card" onclick="showPage('score')">
+      <div class="index-card-icon">🏆</div>
+      <div class="index-card-title">Score Composto</div>
+      <div class="index-card-desc">Índice que combina 6 KPIs para ranking competitivo entre operações</div>
+    </a>
+    <a class="index-card" onclick="showPage('pus')">
+      <div class="index-card-icon">📦</div>
+      <div class="index-card-title">PUS — Pick Up Success (FM)</div>
+      <div class="index-card-desc">KPI principal First Mile. Coleta de pacotes nos sellers. Meta: ≥ 94%</div>
+    </a>
+    <a class="index-card" onclick="showPage('update')">
+      <div class="index-card-icon">🔄</div>
+      <div class="index-card-title">Como Atualizar</div>
+      <div class="index-card-desc">Passo a passo completo para atualizar o dashboard toda semana</div>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="block">
+    <div class="block-title">Estrutura da Regional SPIO</div>
+    <table class="data-table">
+      <tr><th>Tipo</th><th>Identificador</th><th>Operações</th><th>Milha</th></tr>
+      <tr><td><span class="pill pill-blue">Service Center</span></td><td><span class="mono">SSP*</span></td><td>13 operações (Franca, S.Carlos, Cps Virtual, Marília, Rib.Preto, Campinas, P.Prudente, Jales, S.J.R.Preto, Bauru, Araçatuba, Barretos, Avaré)</td><td>Last Mile</td></tr>
+      <tr><td><span class="pill pill-green">Hub XD</span></td><td><span class="mono">BRXSP*</span></td><td>6 hubs (BRXSP2, BRXSP5, BRXSP7, BRXSP8, BRXSP11, BRXSP14)</td><td>First Mile</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ COMO ATUALIZAR ═══ -->
+<div class="page" id="page-update">
+  <div class="page-header">
+    <div class="page-badge">Operacional</div>
+    <div class="page-title">Como Atualizar<br>o Dashboard</div>
+    <div class="page-desc">Processo completo para gerar e publicar o Weekly Report toda semana. Tempo estimado: 10 minutos.</div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Pré-requisitos</div>
+    <p>Python 3.13+ instalado · Conta GitHub ativa (<code>junioradilson-commits</code>) · Arquivo <code>report_SPIO_OFFICIAL.py</code> na pasta Documents</p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Passo 1 — Atualizar os dados no arquivo .py</div>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Abrir o arquivo no editor</div>
+        <div class="step-desc">Abra <code>report_SPIO_OFFICIAL.py</code> no VS Code ou qualquer editor de texto. Localize a seção <code>SEMANA_ATUAL</code> e atualize o período.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">Atualizar LM_DATA (Last Mile)</div>
+        <div class="step-desc">Substitua os valores de <code>dsr</code>, <code>ant</code>, <code>fdds</code>, <code>ftds</code>, <code>rts</code>, <code>csat</code> e <code>score</code> para cada uma das 13 operações com os dados da semana atual. Os valores vêm do Tableau OTR Regional.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">Atualizar FM_DATA (First Mile)</div>
+        <div class="step-desc">Substitua <code>pus</code>, <code>pant</code>, <code>cr</code>, <code>bl</code>, <code>ea</code>, <code>cap</code>, <code>drv</code>, <code>car</code>, <code>oth</code>, <code>est</code>, <code>col</code>, <code>spr</code> para os 6 hubs XD.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Passo 2 — Gerar o HTML</div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <div class="step-title">Abrir PowerShell (barra azul, não Claude Code)</div>
+        <div class="step-desc"><kbd>Win + R</kbd> → digitar <code>powershell</code> → OK. Importante: usar o PowerShell normal, não o terminal do Claude Code.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <div class="step-title">Rodar o script</div>
+        <div class="step-desc"><code>cd C:\Users\adilsojunior\Documents</code> → <code>python report_SPIO_OFFICIAL.py</code>. O HTML será gerado automaticamente e aberto no browser.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Passo 3 — Publicar no GitHub Pages</div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-content">
+        <div class="step-title">Renomear o arquivo gerado</div>
+        <div class="step-desc">O script gera <code>whatsapp_spio_v2.html</code>. Renomeie para <code>index.html</code> antes de fazer upload.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">7</div>
+      <div class="step-content">
+        <div class="step-title">Fazer upload no GitHub</div>
+        <div class="step-desc">Acesse <code>github.com/junioradilson-commits/spio-report</code> → <strong>Add file</strong> → <strong>Upload files</strong> → arraste o <code>index.html</code> → <strong>Commit changes</strong>.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">8</div>
+      <div class="step-content">
+        <div class="step-title">Compartilhar o link</div>
+        <div class="step-desc">O link permanece o mesmo toda semana: <code>https://junioradilson-commits.github.io/spio-report</code>. Cole no grupo do WhatsApp.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-text"><strong>Dica:</strong> No futuro, os blocos <code>LM_DATA</code> e <code>FM_DATA</code> podem ser substituídos por queries diretas ao BigQuery, eliminando a atualização manual. Os comentários <code># ⚠️ BQ REAL:</code> no código indicam exatamente onde fazer essa integração.</div>
+  </div>
+</div>
+
+<!-- ═══ DSR ═══ -->
+<div class="page" id="page-dsr">
+  <div class="page-header">
+    <div class="page-badge">Last Mile · KPI Principal</div>
+    <div class="page-title">DSR<br>Delivery Success Rate</div>
+    <div class="page-desc">O indicador mais importante da operação Last Mile. Mede a porcentagem de pacotes efetivamente entregues sobre o total despachado.</div>
+  </div>
+
+  <div class="kpi-hero">
+    <div>
+      <div class="kpi-hero-label">Fórmula Oficial (Glossary OTR Regional)</div>
+      <div class="kpi-hero-name">DSR</div>
+      <div class="kpi-hero-desc">Porcentagem de entregas realizadas com sucesso sobre o total de pacotes despachados no período. Um pacote é considerado "entregue" quando o motorista registra a confirmação de entrega no app.</div>
+    </div>
+    <div class="kpi-hero-formula">Entregues ÷ Despachados × 100</div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Detalhes do Cálculo</div>
+    <table class="data-table">
+      <tr><th>Campo</th><th>Descrição</th><th>Fonte BQ</th></tr>
+      <tr><td><strong>Entregues</strong></td><td>Shipments com <code>DELIVERY_SUCCESS_LEVEL_1 = 'DELIVERED'</code></td><td><span class="mono">BT_SHP_SHIPMENTS_LAST_MILE</span></td></tr>
+      <tr><td><strong>Despachados</strong></td><td>Total de shipments com <code>LM_DELIVERY_SUCCESS_EVALUATION = 1</code></td><td><span class="mono">BT_SHP_SHIPMENTS_LAST_MILE</span></td></tr>
+      <tr><td><strong>Agrupamento</strong></td><td>Por <code>SHP_LG_FACILITY_ID</code> (ID do Service Center)</td><td><span class="mono">DEPARA_REGIONAL</span></td></tr>
+      <tr><td><strong>Período</strong></td><td>Data de despacho (<code>SHP_LG_INIT_DT_TZ</code>), janela de 7 dias</td><td>—</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Metas e Semáforo</div>
+    <div class="threshold-grid">
+      <div class="t-box" style="background:#FFEBEE">
+        <div class="t-box-label" style="color:#B71C1C">Crítico</div>
+        <div class="t-box-value" style="color:#B71C1C">&lt; 95%</div>
+        <div class="t-box-desc" style="color:#B71C1C">Ação imediata necessária</div>
+      </div>
+      <div class="t-box" style="background:#FFF3E0">
+        <div class="t-box-label" style="color:#E65100">Atenção</div>
+        <div class="t-box-value" style="color:#E65100">95 – 97%</div>
+        <div class="t-box-desc" style="color:#E65100">Monitorar e planejar ações</div>
+      </div>
+      <div class="t-box" style="background:#E8F5E9">
+        <div class="t-box-label" style="color:#2E7D32">OK</div>
+        <div class="t-box-value" style="color:#2E7D32">≥ 97%</div>
+        <div class="t-box-desc" style="color:#2E7D32">Meta atingida</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">O que o KPI revela</div>
+    <p>O DSR é a métrica síntese da saúde operacional de um Service Center. Ele captura o resultado final da jornada de entrega — se o pacote chegou ao destinatário ou não.</p>
+    <p>Um DSR baixo pode indicar: problemas com qualidade de endereço no banco de dados, alta taxa de buyer ausente (horário inadequado de entrega), motoristas sem cobertura da zona, ou falhas no sistema de roteamento.</p>
+    <p>A meta de 97% é o threshold padrão da malha Meli Brasil para operações Last Mile. Operações abaixo de 95% entram em regime de acompanhamento diário e acionamento do time regional.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Variações monitoradas no dashboard</div>
+    <table class="data-table">
+      <tr><th>Variante</th><th>Alias</th><th>Descrição</th></tr>
+      <tr><td>DS Forward</td><td><span class="mono">ds_fwd</span></td><td>DSR apenas para shipments de entrega (forward logistics)</td></tr>
+      <tr><td>DS Reverse</td><td><span class="mono">ds_rev</span></td><td>DSR para shipments de devolução (reverse logistics)</td></tr>
+      <tr><td>DS Weekdays</td><td>—</td><td>DSR em dias úteis</td></tr>
+      <tr><td>DS Weekends</td><td>—</td><td>DSR nos fins de semana</td></tr>
+    </table>
+  </div>
+
+  <div class="callout callout-warn">
+    <div class="callout-icon">⚠️</div>
+    <div class="callout-text"><strong>Atenção ao campo de join:</strong> O campo correto para vincular com a DEPARA_REGIONAL é <code>SHP_LG_FACILITY_ID</code>, não <code>SHP_LG_INIT_FACILITY_ID</code>. O campo Init indica o ponto de origem, não o service center de despacho.</div>
+  </div>
+</div>
+
+<!-- ═══ FDDS ═══ -->
+<div class="page" id="page-fdds">
+  <div class="page-header">
+    <div class="page-badge">Last Mile · KPI de Velocidade</div>
+    <div class="page-title">FDDS<br>First Day Delivery Success</div>
+    <div class="page-desc">Mede a porcentagem de pacotes entregues no primeiro dia em que foram colocados em rota, sobre o total de pacotes despachados para o primeiro dia.</div>
+  </div>
+
+  <div class="kpi-hero">
+    <div>
+      <div class="kpi-hero-label">Fórmula Oficial (ID 81 — Glossary OTR)</div>
+      <div class="kpi-hero-name">FDDS</div>
+      <div class="kpi-hero-desc">Shipments entregues no primeiro dia na rota, dividido pelo total de shipments despachados para o primeiro dia. Diferente do DSR, o FDDS não considera re-tentativas em dias posteriores.</div>
+    </div>
+    <div class="kpi-hero-formula">Ent. no 1º dia ÷ Desp. 1º dia × 100</div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Diferença entre DSR, FDDS e FTDS</div>
+    <table class="data-table">
+      <tr><th>KPI</th><th>O que conta como sucesso</th><th>Foco</th></tr>
+      <tr><td><strong>DSR</strong></td><td>Entregue em qualquer dia (D0, D+1, D+2...)</td><td>Resultado final</td></tr>
+      <tr><td><strong>FDDS</strong></td><td>Entregue no primeiro dia na rota (D0)</td><td>Velocidade</td></tr>
+      <tr><td><strong>FTDS</strong></td><td>Entregue na primeira tentativa E no primeiro dia</td><td>Eficiência da tentativa</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Metas</div>
+    <div class="threshold-grid">
+      <div class="t-box" style="background:#FFEBEE"><div class="t-box-label" style="color:#B71C1C">Crítico</div><div class="t-box-value" style="color:#B71C1C">&lt; 92%</div></div>
+      <div class="t-box" style="background:#FFF3E0"><div class="t-box-label" style="color:#E65100">Atenção</div><div class="t-box-value" style="color:#E65100">92 – 95%</div></div>
+      <div class="t-box" style="background:#E8F5E9"><div class="t-box-label" style="color:#2E7D32">OK</div><div class="t-box-value" style="color:#2E7D32">≥ 95%</div></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">O que o KPI revela</div>
+    <p>O FDDS é um indicador de velocidade operacional. Uma operação com DSR alto mas FDDS baixo indica que os pacotes estão sendo entregues, mas com muitas re-tentativas ou re-despachos — o que gera custo adicional e pior experiência para o comprador.</p>
+    <p>No contexto do Mercado Livre, o FDDS está diretamente ligado à promessa de entrega ao comprador. Um FDDS baixo pode resultar em aumento de reclamações e impacto no NPS do seller.</p>
+  </div>
+</div>
+
+<!-- ═══ FTDS ═══ -->
+<div class="page" id="page-ftds">
+  <div class="page-header">
+    <div class="page-badge">Last Mile · KPI de Eficiência</div>
+    <div class="page-title">FTDS<br>First Time Delivery Success</div>
+    <div class="page-desc">O KPI mais exigente da Last Mile. Mede entregas na primeira tentativa E no primeiro dia na rota.</div>
+  </div>
+
+  <div class="kpi-hero">
+    <div>
+      <div class="kpi-hero-label">Fórmula Oficial (ID 82 — Glossary OTR)</div>
+      <div class="kpi-hero-name">FTDS</div>
+      <div class="kpi-hero-desc">Shipments entregues na primeira tentativa de entrega E no primeiro dia na rota, sobre o total de shipments despachados. É o KPI mais restritivo pois exige as duas condições simultaneamente.</div>
+    </div>
+    <div class="kpi-hero-formula">Ent. 1ª tent. e 1º dia ÷ Total desp. × 100</div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Metas</div>
+    <div class="threshold-grid">
+      <div class="t-box" style="background:#FFEBEE"><div class="t-box-label" style="color:#B71C1C">Crítico</div><div class="t-box-value" style="color:#B71C1C">&lt; 90%</div></div>
+      <div class="t-box" style="background:#FFF3E0"><div class="t-box-label" style="color:#E65100">Atenção</div><div class="t-box-value" style="color:#E65100">90 – 93%</div></div>
+      <div class="t-box" style="background:#E8F5E9"><div class="t-box-label" style="color:#2E7D32">OK</div><div class="t-box-value" style="color:#2E7D32">≥ 93%</div></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">O que o KPI revela</div>
+    <p>O FTDS revela a qualidade da execução operacional em nível granular. Um FTDS baixo indica que os motoristas estão tendo que fazer múltiplas tentativas por endereço — o que reduz a produtividade (SPR cai) e aumenta o custo por entrega.</p>
+    <p>Causas comuns de FTDS baixo: endereços incorretos ou sem complemento, buyer ausente no horário da primeira tentativa, porteiros ou condomínios com dificuldade de acesso, ou motoristas que registram falha sem tentar a entrega (ghost visits).</p>
+  </div>
+</div>
+
+<!-- ═══ RTS ═══ -->
+<div class="page" id="page-rts">
+  <div class="page-header">
+    <div class="page-badge">Last Mile · KPI de Devolução</div>
+    <div class="page-title">RTS Rate<br>Return to Sender</div>
+    <div class="page-desc">Mede a taxa de pacotes que retornam para a estação sem serem entregues ao destinatário final.</div>
+  </div>
+
+  <div class="kpi-hero">
+    <div>
+      <div class="kpi-hero-label">Fórmula</div>
+      <div class="kpi-hero-name">RTS Rate</div>
+      <div class="kpi-hero-desc">Pacotes que retornam à estação sobre o total despachado. O RTS pode acontecer após uma tentativa malsucedida, por instrução do buyer, ou por problema de endereço irrecuperável. Este KPI é a governança do Adilson como focal de RETURNS na SPIO.</div>
+    </div>
+    <div class="kpi-hero-formula">Pacotes RTS ÷ Despachados × 100</div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Metas</div>
+    <div class="threshold-grid">
+      <div class="t-box" style="background:#FFEBEE"><div class="t-box-label" style="color:#B71C1C">Alto</div><div class="t-box-value" style="color:#B71C1C">&gt; 4%</div><div class="t-box-desc" style="color:#B71C1C">Revisão urgente</div></div>
+      <div class="t-box" style="background:#FFF3E0"><div class="t-box-label" style="color:#E65100">Médio</div><div class="t-box-value" style="color:#E65100">2.5 – 4%</div><div class="t-box-desc" style="color:#E65100">Atenção</div></div>
+      <div class="t-box" style="background:#E8F5E9"><div class="t-box-label" style="color:#2E7D32">Controlado</div><div class="t-box-value" style="color:#2E7D32">&lt; 2.5%</div><div class="t-box-desc" style="color:#2E7D32">Meta</div></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Impacto no Score Composto</div>
+    <p>No score composto do dashboard, o RTS entra como "Anti-RTS" (<code>100 - rts_rate</code>), com peso de 10%. Ou seja: quanto menor o RTS, melhor o score da operação. Uma operação com RTS de 5% contribui com 95 pontos nessa dimensão, enquanto uma com RTS de 1% contribui com 99 pontos.</p>
+  </div>
+
+  <div class="block">
+    <div class="block-title">O que o KPI revela</div>
+    <p>Um RTS alto é caro para o Meli: o pacote volta para a estação, gera custo de handling adicional, e pode resultar em reembolso ao comprador sem que o seller receba o produto de volta. Por isso a governança de RETURNS é tratada como focal dedicado na estrutura DX.</p>
+    <p>No contexto da SPIO, Franca lidera o RTS com 5.19% — mais que o dobro da meta — enquanto Avaré mantém 0.83%, o melhor da regional.</p>
+  </div>
+</div>
+
+<!-- ═══ CSAT ═══ -->
+<div class="page" id="page-csat">
+  <div class="page-header">
+    <div class="page-badge">Last Mile · KPI de Experiência</div>
+    <div class="page-title">CSAT<br>Customer Satisfaction Score</div>
+    <div class="page-desc">Mede a satisfação do motorista (driver) com a operação. No contexto DX, o CSAT é o termômetro da experiência do parceiro logístico.</div>
+  </div>
+
+  <div class="kpi-hero">
+    <div>
+      <div class="kpi-hero-label">Fórmula Oficial (ID 257 — Glossary OTR)</div>
+      <div class="kpi-hero-name">CSAT</div>
+      <div class="kpi-hero-desc">Porcentagem de respostas "promotoras" (nota alta) dividida pelo total de respostas recebidas dos motoristas. Similar ao NPS, mas calculado como proporção simples das respostas positivas.</div>
+    </div>
+    <div class="kpi-hero-formula">Respostas promotoras ÷ Total respostas × 100</div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Metas</div>
+    <div class="threshold-grid">
+      <div class="t-box" style="background:#FFEBEE"><div class="t-box-label" style="color:#B71C1C">Crítico</div><div class="t-box-value" style="color:#B71C1C">&lt; 75%</div></div>
+      <div class="t-box" style="background:#FFF3E0"><div class="t-box-label" style="color:#E65100">Atenção</div><div class="t-box-value" style="color:#E65100">75 – 85%</div></div>
+      <div class="t-box" style="background:#E8F5E9"><div class="t-box-label" style="color:#2E7D32">OK</div><div class="t-box-value" style="color:#2E7D32">≥ 85%</div></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Correlação CSAT × DSR — Scatter no Dashboard</div>
+    <p>O gráfico de dispersão DSR × CSAT do dashboard revela uma correlação positiva: operações onde o motorista tem melhor experiência tendem a ter maior DSR. Isso faz sentido operacionalmente — um motorista satisfeito é mais engajado, comete menos ghost visits e tende a insistir mais nas entregas difíceis.</p>
+    <p>Os quadrantes do scatter têm interpretações práticas: <strong>Champions</strong> (alto DSR + alto CSAT) são referências de boas práticas. <strong>Atenção total</strong> (baixo DSR + baixo CSAT) precisam de intervenção estrutural. <strong>Alta entrega, baixa experiência</strong> pode indicar sobrecarga operacional (motorista entrega bem mas está insatisfeito com condições de trabalho).</p>
+  </div>
+</div>
+
+<!-- ═══ DU BREAKDOWN ═══ -->
+<div class="page" id="page-du">
+  <div class="page-header">
+    <div class="page-badge">Last Mile · Diagnóstico de Falhas</div>
+    <div class="page-title">DU Breakdown<br>Delivery Unsuccess por Motivo</div>
+    <div class="page-desc">Decomposição das falhas de entrega por categoria de motivo. Permite identificar a causa raiz do DSR baixo em cada operação.</div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Categorias de DU</div>
+    <table class="data-table">
+      <tr><th>Campo</th><th>Alias Glossary</th><th>ID</th><th>Descrição</th><th>Ação típica</th></tr>
+      <tr>
+        <td><span class="mono">du_abs</span></td>
+        <td>DU att. - buyer absent</td>
+        <td>217</td>
+        <td>Pacote não entregue porque o comprador não estava no endereço</td>
+        <td>Agendamento de re-entrega, notificação ao buyer</td>
+      </tr>
+      <tr>
+        <td><span class="mono">du_adr</span></td>
+        <td>DU att. - bad address</td>
+        <td>214</td>
+        <td>Endereço incorreto, incompleto ou não encontrado</td>
+        <td>Enriquecimento de base de endereços, POC drop em lugar</td>
+      </tr>
+      <tr>
+        <td><span class="mono">du_cls</span></td>
+        <td>DU att. - business closed</td>
+        <td>216</td>
+        <td>Destinatário comercial fechado no horário da tentativa</td>
+        <td>Ajuste de janela de entrega para endereços comerciais</td>
+      </tr>
+      <tr>
+        <td><span class="mono">du_nat</span></td>
+        <td>DU not attempted</td>
+        <td>222</td>
+        <td>Pacote não foi nem tentado — motorista retornou sem tentar</td>
+        <td>Auditoria de rota, análise de ghost visits, ação disciplinar</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="callout callout-warn">
+    <div class="callout-icon">🔍</div>
+    <div class="callout-text"><strong>DU Não Tentado é o mais crítico:</strong> Enquanto "Ausente" e "Endereço" podem ter causas externas, o "Não Tentado" é 100% responsabilidade operacional. Um alto <code>du_nat</code> indica motoristas que retornam com pacotes sem tentar a entrega — o que pode mascarar uma alta taxa de ghost visits.</div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Como ler o gráfico Stacked no Dashboard</div>
+    <p>O gráfico de DU Breakdown usa barras empilhadas horizontais. O comprimento total da barra representa o DU total da operação. Cada segmento de cor mostra a proporção de cada motivo.</p>
+    <p>Uma operação com barra longa e predominância de vermelho (Ausente) tem um problema diferente de uma com barra longa e predominância de cinza (Não Tentado) — e as ações corretivas são completamente distintas.</p>
+  </div>
+</div>
+
+<!-- ═══ SCORE ═══ -->
+<div class="page" id="page-score">
+  <div class="page-header">
+    <div class="page-badge">Last Mile · Ranking</div>
+    <div class="page-title">Score Composto<br>Índice de Performance SPIO</div>
+    <div class="page-desc">Um índice único que combina 6 KPIs para criar um ranking competitivo e comparável entre todas as operações da regional.</div>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula-title">Fórmula do Score Composto</div>
+    <div class="formula-expr">Score = DSR×0.35 + FDDS×0.20 + FTDS×0.15 + (100-RTS)×0.10 + (100-Failed)×0.10 + CSAT×0.10</div>
+    <div class="formula-parts">
+      <div class="fp"><div class="fp-kpi">DSR</div><div class="fp-peso">35% do score</div><div class="fp-desc">Componente principal</div></div>
+      <div class="fp"><div class="fp-kpi">FDDS</div><div class="fp-peso">20% do score</div><div class="fp-desc">Velocidade 1º dia</div></div>
+      <div class="fp"><div class="fp-kpi">FTDS</div><div class="fp-peso">15% do score</div><div class="fp-desc">Eficiência tentativa</div></div>
+      <div class="fp"><div class="fp-kpi">Anti-RTS</div><div class="fp-peso">10% do score</div><div class="fp-desc">100 - RTS Rate</div></div>
+      <div class="fp"><div class="fp-kpi">Anti-Failed</div><div class="fp-peso">10% do score</div><div class="fp-desc">100 - Failed Visits</div></div>
+      <div class="fp"><div class="fp-kpi">CSAT</div><div class="fp-peso">10% do score</div><div class="fp-desc">Experiência driver</div></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Por que usar o Score e não só o DSR?</div>
+    <p>O DSR sozinho pode mascarar problemas. Uma operação pode ter DSR de 97% mas RTS de 6% (entrega com muitas devoluções) ou FTDS de 88% (entrega com muitas re-tentativas). O score composto penaliza esses casos e premia operações que são boas em todas as dimensões simultaneamente.</p>
+    <p>O peso maior do DSR (35%) garante que a entrega efetiva continua sendo o fator mais importante. Os outros KPIs distribuem os 65% restantes para capturar a qualidade e eficiência do processo.</div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Referência de Score da SPIO (Semana 10/04)</div>
+    <table class="data-table">
+      <tr><th>Posição</th><th>Operação</th><th>Score</th><th>DSR</th></tr>
+      <tr><td>🥇 1º</td><td>Avaré</td><td><strong>97.8</strong></td><td>99.17%</td></tr>
+      <tr><td>🥈 2º</td><td>Barretos</td><td><strong>97.5</strong></td><td>99.01%</td></tr>
+      <tr><td>🥉 3º</td><td>Araçatuba</td><td><strong>96.6</strong></td><td>98.27%</td></tr>
+      <tr><td>13º</td><td>Franca</td><td><strong>90.9</strong></td><td>94.81%</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ WoW ═══ -->
+<div class="page" id="page-wow">
+  <div class="page-header">
+    <div class="page-badge">Last Mile · Evolução</div>
+    <div class="page-title">WoW<br>Week over Week</div>
+    <div class="page-desc">Variação do DSR entre a semana atual e a semana anterior, em pontos percentuais.</div>
+  </div>
+
+  <div class="kpi-hero">
+    <div>
+      <div class="kpi-hero-label">Fórmula</div>
+      <div class="kpi-hero-name">WoW</div>
+      <div class="kpi-hero-desc">Diferença entre o DSR da semana atual e o DSR da semana anterior, expressa em pontos percentuais (p.p.). Positivo = melhora. Negativo = piora.</div>
+    </div>
+    <div class="kpi-hero-formula">DSR atual − DSR anterior</div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">No arquivo Python</div>
+    <p>O WoW é calculado automaticamente: <code>wow = round(dsr_atual - dsr_ant, 2)</code>. Para atualizar, basta preencher o campo <code>"ant"</code> de cada operação em <code>LM_DATA</code> com o DSR da semana anterior.</p>
+    <p>O WoW regional (<code>lm_wow</code>) é calculado como a diferença entre o DSR regional atual (<code>lm_dsr</code>) e o DSR regional anterior (<code>lm_ant</code>), ambos informados manualmente no bloco de configuração.</p>
+  </div>
+</div>
+
+<!-- ═══ PUS ═══ -->
+<div class="page" id="page-pus">
+  <div class="page-header">
+    <div class="page-badge">First Mile · KPI Principal</div>
+    <div class="page-title">PUS<br>Pick Up Success</div>
+    <div class="page-desc">O indicador central da operação First Mile. Mede se o motorista conseguiu coletar os pacotes nos sellers no horário programado.</div>
+  </div>
+
+  <div class="kpi-hero">
+    <div>
+      <div class="kpi-hero-label">Fórmula Oficial (ID 41 — Glossary OTR / DM_SHP_XD_PICKUP)</div>
+      <div class="kpi-hero-name">PUS</div>
+      <div class="kpi-hero-desc">Porcentagem de coletas realizadas com sucesso sobre o total de coletas estimadas para o período. Um PUS é contabilizado quando o motorista registra a coleta no hub dentro da janela EDPU.</div>
+    </div>
+    <div class="kpi-hero-formula">Coletas realizadas ÷ Coletas estimadas × 100</div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Fonte de Dados</div>
+    <table class="data-table">
+      <tr><th>Campo</th><th>Descrição</th><th>Tabela BQ</th></tr>
+      <tr><td><strong>Estimados</strong></td><td>Shipments com <code>PICKUP_SUCCESS_CLASIFICATION IS NOT NULL</code></td><td><span class="mono">DM_SHP_XD_PICKUP</span></td></tr>
+      <tr><td><strong>Coletados</strong></td><td>Shipments com <code>PICKUP_SUCCESS = 1</code></td><td><span class="mono">DM_SHP_XD_PICKUP</span></td></tr>
+      <tr><td><strong>Hub</strong></td><td>Identificado pelo código <code>BRXSP*</code> da <code>DEPARA_REGIONAL</code></td><td><span class="mono">DEPARA_REGIONAL</span></td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Metas</div>
+    <div class="threshold-grid">
+      <div class="t-box" style="background:#FFEBEE"><div class="t-box-label" style="color:#B71C1C">Crítico</div><div class="t-box-value" style="color:#B71C1C">&lt; 92%</div></div>
+      <div class="t-box" style="background:#FFF3E0"><div class="t-box-label" style="color:#E65100">Atenção</div><div class="t-box-value" style="color:#E65100">92 – 94%</div></div>
+      <div class="t-box" style="background:#E8F5E9"><div class="t-box-label" style="color:#2E7D32">OK</div><div class="t-box-value" style="color:#2E7D32">≥ 94%</div></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">O que o KPI revela</div>
+    <p>O PUS é o equivalente do DSR para a First Mile. Um PUS baixo significa que pacotes não foram coletados nos sellers — o que atrasa toda a cadeia logística e pode comprometer a promessa de entrega ao comprador final.</p>
+    <p>Diferente do DSR, um PUS baixo tem causas mais operacionais do lado Meli (falta de motorista, hub sem capacidade, carrier com problema) do que do lado do cliente. Por isso o No PUS Breakdown classifica as falhas por "culpa Meli".</p>
+  </div>
+</div>
+
+<!-- ═══ COLLECTION RATE ═══ -->
+<div class="page" id="page-cr">
+  <div class="page-header">
+    <div class="page-badge">First Mile · Eficiência</div>
+    <div class="page-title">Collection Rate<br>Taxa de Coleta</div>
+    <div class="page-desc">Mede a proporção entre o volume efetivamente coletado e o volume estimado para o hub no período.</div>
+  </div>
+
+  <div class="kpi-hero">
+    <div>
+      <div class="kpi-hero-label">Fórmula</div>
+      <div class="kpi-hero-name">Collection Rate</div>
+      <div class="kpi-hero-desc">Shipments coletados pelo hub dividido pelo total estimado para coleta. Similar ao PUS, mas em volume absoluto — permite ver se um hub está com capacidade de absorção adequada para o volume planejado.</div>
+    </div>
+    <div class="kpi-hero-formula">Shps coletados ÷ Shps estimados × 100</div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Diferença entre PUS e Collection Rate</div>
+    <p>O <strong>PUS</strong> mede a taxa de sucesso em nível de ocorrência de coleta (cada parada no seller). O <strong>Collection Rate</strong> mede o volume total coletado sobre o planejado — considera a quantidade de pacotes, não apenas se a parada foi realizada ou não.</p>
+    <p>Um hub pode ter PUS alto (muitas paradas bem-sucedidas) mas Collection Rate baixo (cada parada coletou menos pacotes que o planejado). Isso indica subestimação de demanda no planejamento de rotas.</p>
+  </div>
+</div>
+
+<!-- ═══ BACKLOG ═══ -->
+<div class="page" id="page-backlog">
+  <div class="page-header">
+    <div class="page-badge">First Mile · Planejamento</div>
+    <div class="page-title">Backlog &amp; Earlies<br>Carteira de Coleta</div>
+    <div class="page-desc">Dois indicadores que revelam a composição da carteira de shipments estimados: pacotes atrasados (Backlog) e pacotes adiantados (Earlies) em relação à janela EDPU.</div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Definições</div>
+    <table class="data-table">
+      <tr><th>KPI</th><th>Campo BQ</th><th>ID Glossary</th><th>Descrição</th><th>Sinal de alerta</th></tr>
+      <tr>
+        <td><strong>Backlog</strong></td>
+        <td><span class="mono">PUS_D = 1</span></td>
+        <td>3</td>
+        <td>Shipments com EDPU (data de coleta) <strong>vencida</strong> — deveriam ter sido coletados antes e ainda estão pendentes</td>
+        <td><strong>&gt; 10%</strong></td>
+      </tr>
+      <tr>
+        <td><strong>Earlies</strong></td>
+        <td><span class="mono">PUS_H = 1</span></td>
+        <td>4</td>
+        <td>Shipments com EDPU <strong>futura</strong> — estão na fila mas ainda não é a data programada de coleta</td>
+        <td>Earlie excessivo indica problemas no planejamento D-1</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <div class="block-title">O que esses KPIs revelam</div>
+    <p>Um <strong>Backlog alto</strong> (&gt;10%) indica que o hub está acumulando pacotes não coletados de dias anteriores. Isso pode ser causado por capacidade insuficiente de motoristas, sellers com alta demanda não prevista, ou falhas na roteização. O Backlog é o sinal mais preocupante para a First Mile.</p>
+    <p><strong>Earlies altos</strong> indicam que o planejamento D-1 está trazendo muitos pacotes para a fila antes do tempo — o que pode causar congestionamento no hub e necessidade de armazenamento temporário. Um nível saudável de Earlies é normal (programação antecipada), mas acima de 20% merece atenção.</p>
+  </div>
+</div>
+
+<!-- ═══ NO PUS ═══ -->
+<div class="page" id="page-nopus">
+  <div class="page-header">
+    <div class="page-badge">First Mile · Diagnóstico</div>
+    <div class="page-title">No PUS Breakdown<br>Motivos de Falha na Coleta</div>
+    <div class="page-desc">Decomposição das coletas não realizadas por categoria de causa, sempre classificadas como "culpa Meli" (responsabilidade operacional interna).</div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Categorias de No PUS (Culpa Meli)</div>
+    <table class="data-table">
+      <tr><th>Campo</th><th>Alias</th><th>ID</th><th>Causa</th><th>Ação</th></tr>
+      <tr><td><span class="mono">cap</span></td><td>NS Capacity</td><td>73</td><td>Hub sem capacidade física de absorver o volume — falta de espaço ou equipamentos</td><td>Revisão de capacidade dinâmica, acordos de linearização</td></tr>
+      <tr><td><span class="mono">drv</span></td><td>NS Driver</td><td>77</td><td>Motorista não foi ao seller — falta de motorista escalado ou absenteísmo</td><td>Gestão de escala, substitutos, acordos com carrier</td></tr>
+      <tr><td><span class="mono">car</span></td><td>NS Carrier</td><td>82</td><td>Carrier (transportadora) não enviou veículo ou motorista dentro do prazo</td><td>SLA com carrier, penalidades contratuais</td></tr>
+      <tr><td><span class="mono">oth</span></td><td>Outros</td><td>—</td><td>Demais motivos: NPTC, cancelamento, etc.</td><td>Análise caso a caso</td></tr>
+    </table>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-icon">📊</div>
+    <div class="callout-text"><strong>NS Capacity é o mais crítico:</strong> Indica problema estrutural no hub. Um hub com NS Capacity alto precisa de revisão de capacidade — não adianta escalar mais motoristas se o hub não tem onde processar os pacotes.</div>
+  </div>
+</div>
+
+<!-- ═══ SPR FM ═══ -->
+<div class="page" id="page-spr_fm">
+  <div class="page-header">
+    <div class="page-badge">First Mile · Produtividade</div>
+    <div class="page-title">SPR First Mile<br>Shipments per Route</div>
+    <div class="page-desc">Mede a produtividade das rotas de coleta First Mile — quantos pacotes cada rota carrega em média.</div>
+  </div>
+
+  <div class="kpi-hero">
+    <div>
+      <div class="kpi-hero-label">Fórmula Oficial (ID 583 — Glossary OTR)</div>
+      <div class="kpi-hero-name">SPR FM</div>
+      <div class="kpi-hero-desc">Total de shipments despachados em rotas First Mile (excluindo cancelamentos) dividido pelo total de rotas executadas. Mede o aproveitamento médio de cada rota de coleta.</div>
+    </div>
+    <div class="kpi-hero-formula">Total shps FM ÷ Total rotas FM</div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">O que o KPI revela</div>
+    <p>Um SPR FM alto indica que cada rota de coleta está bem carregada — boa eficiência de veículo e custo por pacote mais baixo. Um SPR FM baixo pode indicar rotas subutilizadas, excesso de rotas para um volume pequeno, ou muitas paradas com poucos pacotes cada.</p>
+    <p>No dashboard, o SPR FM é apresentado junto com o <strong>Stops por Rota</strong> (paradas por rota) em subplots separados. A combinação de SPR alto com Stops baixo indica rotas eficientes com sellers de alto volume. SPR baixo com Stops alto indica muitas paradas pequenas — candidatas à consolidação de rota.</p>
+  </div>
+</div>
+
+<!-- ═══ GUIA DE GRÁFICOS ═══ -->
+<div class="page" id="page-viz">
+  <div class="page-header">
+    <div class="page-badge">Dashboard · Visualizações</div>
+    <div class="page-title">Guia dos Gráficos<br>Como Ler Cada Visualização</div>
+    <div class="page-desc">Referência rápida para interpretar cada gráfico presente no dashboard SPIO.</div>
+  </div>
+
+  <div class="block">
+    <div class="block-title">Last Mile — Gráficos</div>
+    <table class="data-table">
+      <tr><th>Gráfico</th><th>Tipo</th><th>Como ler</th><th>O que procurar</th></tr>
+      <tr><td><strong>DSR por SVC</strong></td><td>Barras horizontais (floating)</td><td>Barras começam em 88% — tamanho reflete diferença real de performance. Vermelho &lt;95%, laranja 95-97%, verde ≥97%</td><td>Barras curtas = operação próxima do limite. Linha vermelha = threshold 97%</td></tr>
+      <tr><td><strong>WoW Atual vs Anterior</strong></td><td>Barras agrupadas (floating)</td><td>Barra cinza = semana anterior, colorida = atual. Rótulo mostra valor exato de cada semana</td><td>Barras coloridas maiores que cinzas = melhora. Inversão = piora</td></tr>
+      <tr><td><strong>Ranking Score</strong></td><td>Barras horizontais (floating)</td><td>Ordena operações pelo score composto (6 KPIs). Medalhas nos 3 primeiros</td><td>Distância entre 1º e último lugar = dispersão de performance na regional</td></tr>
+      <tr><td><strong>Status por Operação</strong></td><td>Tabela semafórica</td><td>Cada linha = uma operação. Colunas: DSR atual, WoW e status (OK/ATENÇÃO/CRÍTICO)</td><td>Qualquer linha vermelha = ação imediata</td></tr>
+      <tr><td><strong>Mapa de Calor</strong></td><td>Heatmap</td><td>Linhas = KPIs, colunas = operações. Verde pastel = melhor dentro da regional, vermelho pastel = pior</td><td>Colunas com muitas células vermelhas = operação sistematicamente ruim em vários KPIs</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <div class="block-title">First Mile — Gráficos</div>
+    <table class="data-table">
+      <tr><th>Gráfico</th><th>Tipo</th><th>Como ler</th><th>O que procurar</th></tr>
+      <tr><td><strong>PUS por Hub</strong></td><td>Barras agrupadas (floating a partir de 85%)</td><td>Cinza = anterior, colorido = atual. Rótulos em ambas as barras. Meta 94% (linha tracejada)</td><td>Hubs abaixo de 94% = atenção. Barra atual menor que cinza = piora</td></tr>
+      <tr><td><strong>No PUS Breakdown</strong></td><td>Barras empilhadas</td><td>Cada cor = um motivo de falha. Altura total = No PUS total do hub</td><td>Hub com muito vermelho (NS Capacity) = problema estrutural. Laranja (NS Driver) = problema de escala</td></tr>
+      <tr><td><strong>Volume Estimado vs Coletado</strong></td><td>Barras + linha (eixo duplo)</td><td>Cinza = estimado, colorido = coletado. Linha azul escuro = Collection Rate (eixo direito em %)</td><td>Barra colorida muito menor que cinza = hub subcoletando. Linha abaixo de 93% = alerta</td></tr>
+      <tr><td><strong>Backlog vs Earlies</strong></td><td>Barras agrupadas</td><td>Rosa = Backlog (EDPU vencida), azul = Earlies (EDPU futura). Linha laranja tracejada = threshold 10%</td><td>Barras rosas acima da linha laranja = backlog crítico. Ação urgente necessária</td></tr>
+    </table>
+  </div>
+
+  <div class="callout callout-tip">
+    <div class="callout-icon">💡</div>
+    <div class="callout-text"><strong>Dica de uso:</strong> No dashboard interativo, passe o cursor sobre qualquer barra para ver os valores exatos em um tooltip. Em dispositivos móveis, toque na barra para ver o detalhe. Os botões Last Mile / First Mile no topo alternam entre as duas visões sem recarregar a página.</div>
+  </div>
+</div>
+
+</main>
+
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) {
+      n.classList.add('active');
+    }
+  });
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
